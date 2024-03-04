@@ -1,23 +1,23 @@
-name: Deploy to Server
-
 on:
   push:
-    branches: [ staging ]  # Trigger on pushes to the master branch (adjust as needed)
+    branches:
+      - staging
+  workflow_dispatch:
 
 jobs:
-  deploy:
-    runs-on: ubuntu-latest  # Run the workflow on an Ubuntu machine
+  run_pull:
+    name: run pull
+    runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v3  # Checkout the code from the repository
-      - name: Configure SSH agent
-        uses: robinhood/ssh-key-action@v1
-        with:
-          private_key_path: ${{ secrets.SSH_PRIVATE_KEY }}
-      - name: Install dependencies
+      - name: install ssh keys
+        # check this thread to understand why its needed:
+        # https://stackoverflow.com/a/70447517
         run: |
-          composer install --no-interaction --prefer-dist
-          # Additional steps for your project (e.g., npm install, database migrations)
-      - name: Deploy
-        run: |
-          scp -r ./ .@server_username@server_ip:/var/www/tsk  # Replace with your details
-          # Additional steps for deployment (e.g., run migrations, restart server)
+          install -m 600 -D /dev/null ~/.ssh/id_rsa
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.SSH_HOST }} > ~/.ssh/known_hosts
+      - name: connect and pull
+        run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR }} && git checkout ${{ secrets.STAGING_BRANCH }} && git pull && exit"
+      - name: cleanup
+        run: rm -rf ~/.ssh

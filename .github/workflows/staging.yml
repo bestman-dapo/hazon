@@ -18,6 +18,6 @@ jobs:
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.SSH_HOST }} > ~/.ssh/known_hosts
       - name: connect and pull
-        run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR }} && sudo rm -rf ${{ secrets.WORK_DIR }} && git clone --single-branch --branch staging https://github.com/bestman-dapo/hazon.git && git checkout ${{ secrets.STAGING_BRANCH }} && exit"
+        run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "sudo rm -rf ${{ secrets.WORK_DIR }} && sudo mkdir ${{ secrets.WORK_DIR }} && cd ${{ secrets.WORK_DIR }} && git clone --single-branch --branch staging https://github.com/bestman-dapo/hazon.git && git checkout ${{ secrets.STAGING_BRANCH }} && exit"
       - name: cleanup
         run: rm -rf ~/.ssh

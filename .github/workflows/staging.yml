@@ -1,0 +1,23 @@
+name: Deploy to Server
+
+on:
+  push:
+    branches: [ staging ]  # Trigger on pushes to the master branch (adjust as needed)
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest  # Run the workflow on an Ubuntu machine
+    steps:
+      - uses: actions/checkout@v3  # Checkout the code from the repository
+      - name: Configure SSH agent
+        uses: ssh-keys/action@v1
+        with:
+          private_key_path: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: Install dependencies
+        run: |
+          composer install --no-interaction --prefer-dist
+          # Additional steps for your project (e.g., npm install, database migrations)
+      - name: Deploy
+        run: |
+          scp -r ./ .@server_username@server_ip:/var/www/tsk  # Replace with your details
+          # Additional steps for deployment (e.g., run migrations, restart server)

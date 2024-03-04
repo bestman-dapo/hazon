@@ -1,0 +1,23 @@
+version: "3.9"
+services:
+  # PHP-FPM Service
+  php-fpm:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      # Mounts the local 'app' directory to the container's Nginx root
+      - .:/var/www/html
+
+  # NGINX Service
+  nginx:
+    build:
+      context: .
+      dockerfile: ./nginx/Dockerfile
+    volumes:
+      # Mountlocal 'app' directory to the Nginx root
+      - .:/var/www/html
+    ports:
+      - "8080:80"
+    depends_on:
+      - php-fpm # Depends on the PHP-FPM service

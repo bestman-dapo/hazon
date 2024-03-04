@@ -10,7 +10,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3  # Checkout the code from the repository
       - name: Configure SSH agent
-        uses: hazon/action@v1
+        uses: robinhood/ssh-key-action@v1
         with:
           private_key_path: ${{ secrets.SSH_PRIVATE_KEY }}
       - name: Install dependencies
